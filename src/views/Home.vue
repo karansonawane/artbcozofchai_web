@@ -57,29 +57,12 @@ export default {
           blogCoverPhoto: "apple",
         },
       ],
-      sampleBlogCard: [
-        {
-          blogTitle: "Blog Card #1",
-          blogCoverPhoto: "baby",
-          blogDate: "June 10, 2021",
-        },
-        {
-          blogTitle: "Blog Card #2",
-          blogCoverPhoto: "girl",
-          blogDate: "June 10, 2021",
-        },
-        {
-          blogTitle: "Blog Card #3",
-          blogCoverPhoto: "skull",
-          blogDate: "June 10, 2021",
-        },
-        {
-          blogTitle: "Blog Card #4",
-          blogCoverPhoto: "sparrow",
-          blogDate: "June 10, 2021",
-        },
-      ],
     };
+  },
+  computed: {
+    sampleBlogCard() {
+      return this.$store.state.sampleBlogCard;
+    },
   },
 };
 </script>
