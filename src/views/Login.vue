@@ -4,7 +4,12 @@
       <p class="login-register">
         Don't have an account?
         <router-link class="router-link" :to="{ name: 'Register' }"
-          >Register</router-link
+          >Register.</router-link
+        >
+        <br />
+        or goto home,
+        <router-link class="router-link" :to="{ name: 'Home' }"
+          >Home.</router-link
         >
       </p>
       <h2>Login to artbcozofchai</h2>
@@ -171,7 +176,7 @@ export default {
     display: none;
     flex: 2;
     background-size: cover;
-    background-image: url("../assets/background.png");
+    background-image: url("../assets/background.jpg");
     width: 100%;
     height: 100%;
     @media (min-width: 900px) {
