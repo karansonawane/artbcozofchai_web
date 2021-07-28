@@ -1,5 +1,6 @@
 <template>
   <div class="create-post">
+    <BlogCoverPreview v-show="this.$store.state.blogPhotoPreview" />
     <div class="container">
       <div :class="{ invisible: !error }" class="err-message">
         <p><span>Error:</span>{{ this.errorMsg }}</p>
@@ -13,8 +14,10 @@
             ref="blogPhoto"
             id="blog-photo"
             accept=".png, .jpg, .jpeg"
+            @change="fileChange"
           />
           <button
+            @click="openPreview"
             class="preview"
             :class="{ 'button-inactive': !this.$store.state.blogPhotoFileUrl }"
           >
@@ -28,11 +31,14 @@
           :editorOptions="editorSettings"
           v-model="blogHTML"
           useCustomImageHandler
+          @image-added="imageHandler"
         />
       </div>
       <div class="blog-actions">
-        <button>Publish Blog</button>
-        <router-link class="router-button" to="#">Post Preview</router-link>
+        <button @click="uploadBlog">Publish Blog</button>
+        <router-link class="router-button" :to="{ name: 'BlogPreview' }"
+          >Post Preview</router-link
+        >
       </div>
     </div>
   </div>
@@ -40,6 +46,10 @@
 
 <script>
 import Quill from "quill";
+import BlogCoverPreview from "../components/BlogCoverPreview.vue";
+import firebase from "firebase/app";
+import "firebase/storage";
+// import db from "../firebase/firebaseInit";
 window.Quill = Quill;
 const ImageResize = require("quill-image-resize-module").default;
 Quill.register("modules/imageResize", ImageResize);
@@ -48,6 +58,7 @@ export default {
   name: "CreatePost",
   data() {
     return {
+      file: "null",
       error: null,
       errorMsg: null,
       editorSettings: {
@@ -56,6 +67,82 @@ export default {
         },
       },
     };
+  },
+  components: {
+    BlogCoverPreview,
+  },
+  computed: {
+    profileId() {
+      return this.$store.state.profileId;
+    },
+    blogCoverPhotoName() {
+      return this.$store.state.blogPhotoName;
+    },
+    blogTitle: {
+      get() {
+        return this.$store.state.blogTitle;
+      },
+      set(payload) {
+        this.$store.commit("updateBlogTitle", payload);
+      },
+    },
+    blogHTML: {
+      get() {
+        return this.$store.state.blogHTML;
+      },
+      set(payload) {
+        this.$store.commit("newBlogPost", payload);
+      },
+    },
+  },
+  methods: {
+    fileChange() {
+      this.file = this.$refs.blogPhoto.files[0];
+      const fileName = this.file.name;
+      this.$store.commit("fileNameChange", fileName);
+      this.$store.commit("createFileURL", URL.createObjectURL(this.file));
+    },
+    openPreview() {
+      this.$store.commit("openPhotoPreview");
+    },
+    imageHandler(file, Editor, cursorLocation, resetUploader) {
+      const storageRef = firebase.storage().ref();
+      const docRef = storageRef.child(`documents/blogPostPhotos/${file.name}`);
+      docRef.put(file).on(
+        "state_changed",
+        (snapshot) => {
+          console.log(snapshot);
+        },
+        (err) => {
+          console.log(err);
+        },
+        async () => {
+          const downloadURL = await docRef.getDownloadURL();
+          Editor.insertEmbed(cursorLocation, "image", downloadURL);
+          resetUploader();
+        }
+      );
+    },
+    uploadBlog() {
+      if (this.blogTitle.length !== 0 && this.blogHTML.length !== 0) {
+        if (this.file) {
+          //
+          return;
+        }
+        this.error = true;
+        this.errorMsg = "Please ensure you uploaded a cover photo!";
+        setTimeout(() => {
+          this.error = false;
+        }, 5000);
+        return;
+      }
+      this.error = true;
+      this.errorMsg = "Please ensure Blog Title and Blog Post has been filled!";
+      setTimeout(() => {
+        this.error = false;
+      }, 5000);
+      return;
+    },
   },
 };
 </script>
