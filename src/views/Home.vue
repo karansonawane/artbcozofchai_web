@@ -3,7 +3,7 @@
     <BlogPost v-if="!user" :post="welcomeScreen" />
     <BlogPost
       :post="post"
-      v-for="(post, index) in sampleBlogPost"
+      v-for="(post, index) in blogPostsFeed"
       :key="index"
     />
     <div class="blog-card-wrap">
@@ -12,7 +12,7 @@
         <div class="blog-cards">
           <BlogCard
             :post="post"
-            v-for="(post, index) in sampleBlogCard"
+            v-for="(post, index) in blogPostsCards"
             :key="index"
           />
         </div>
@@ -45,23 +45,14 @@ export default {
         welcomeScreen: true,
         photo: "Leaf",
       },
-      sampleBlogPost: [
-        {
-          title: "This is a filter title!",
-          blogHTML: "This is a filter blog Post title",
-          blogCoverPhoto: "lizz",
-        },
-        {
-          title: "This is a filter title2!",
-          blogHTML: "This is a filter blog Post title",
-          blogCoverPhoto: "apple",
-        },
-      ],
     };
   },
   computed: {
-    sampleBlogCard() {
-      return this.$store.state.sampleBlogCard;
+    blogPostsFeed() {
+      return this.$store.getters.blogPostsFeed;
+    },
+    blogPostsCards() {
+      return this.$store.getters.blogPostsCards;
     },
     user() {
       return this.$store.state.user;
