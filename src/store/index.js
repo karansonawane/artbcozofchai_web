@@ -8,28 +8,6 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    sampleBlogCard: [
-      {
-        blogTitle: "Blog Card #1",
-        blogCoverPhoto: "baby",
-        blogDate: "June 10, 2021",
-      },
-      {
-        blogTitle: "Blog Card #2",
-        blogCoverPhoto: "girl",
-        blogDate: "June 10, 2021",
-      },
-      {
-        blogTitle: "Blog Card #3",
-        blogCoverPhoto: "skull",
-        blogDate: "June 10, 2021",
-      },
-      {
-        blogTitle: "Blog Card #4",
-        blogCoverPhoto: "sparrow",
-        blogDate: "June 10, 2021",
-      },
-    ],
     blogPosts: [],
     postLoaded: null,
     blogHTML: "Write your blog title here...",
@@ -73,6 +51,9 @@ export default new Vuex.Store({
     toggleEditPost(state, payload) {
       state.editPost = payload;
       console.log(state.editPost);
+    },
+    filterBlogPost(state, payload) {
+      state.blogPosts = state.blogPosts.filter(post => post.blogID !== payload);
     },
     updateUser(state, payload) {
       state.user = payload
@@ -122,7 +103,11 @@ export default new Vuex.Store({
         }
       });
       state.postLoaded = true;
-      console.log(state.blogPosts);
+    },
+    async deletePost({ commit }, payload) {
+      const getPost = await db.collection('blogPosts').doc(payload)
+      await getPost.delete();
+      commit('filterBlogPost', payload);
     },
     async updateUserSetting({ commit, state }) {
       const dataBase = await db.collection('users').doc(state.profileId);
